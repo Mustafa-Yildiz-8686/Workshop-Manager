@@ -1,0 +1,99 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ── Dark theme (default) ── */
+:root, [data-theme="dark"] {
+  --bg-app-from: #020617;
+  --bg-app-via: #0f172a;
+  --bg-app-to: #020617;
+  --bg-card: rgba(30, 41, 59, 0.8);
+  --bg-card-alt: rgba(30, 41, 59, 0.6);
+  --bg-card-solid: #1e293b;
+  --bg-input: rgba(51, 65, 85, 0.5);
+  --bg-btn-secondary: #334155;
+  --bg-btn-secondary-hover: #475569;
+  --bg-nav: rgba(15, 23, 42, 0.95);
+  --bg-hover: rgba(51, 65, 85, 0.5);
+  --bg-overlay: rgba(0, 0, 0, 0.6);
+  --text-primary: #ffffff;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+  --text-placeholder: #64748b;
+  --border-card: rgba(51, 65, 85, 0.5);
+  --border-input: #475569;
+  --border-nav: #1e293b;
+  --border-modal: #334155;
+  --scrollbar-thumb: #334155;
+}
+
+/* ── Light theme ── */
+[data-theme="light"] {
+  --bg-app-from: #f1f5f9;
+  --bg-app-via: #ffffff;
+  --bg-app-to: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-alt: rgba(248, 250, 252, 0.9);
+  --bg-card-solid: #ffffff;
+  --bg-input: rgba(241, 245, 249, 0.8);
+  --bg-btn-secondary: #e2e8f0;
+  --bg-btn-secondary-hover: #cbd5e1;
+  --bg-nav: rgba(255, 255, 255, 0.95);
+  --bg-hover: rgba(226, 232, 240, 0.7);
+  --bg-overlay: rgba(0, 0, 0, 0.3);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+  --text-placeholder: #94a3b8;
+  --border-card: rgba(226, 232, 240, 0.8);
+  --border-input: #cbd5e1;
+  --border-nav: #e2e8f0;
+  --border-modal: #e2e8f0;
+  --scrollbar-thumb: #cbd5e1;
+}
+
+body {
+  background: linear-gradient(135deg, var(--bg-app-from), var(--bg-app-via), var(--bg-app-to));
+  color: var(--text-secondary);
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+
+/* ── Theme utility classes ── */
+.bg-app { background: linear-gradient(135deg, var(--bg-app-from), var(--bg-app-via), var(--bg-app-to)); }
+.bg-card { background: var(--bg-card); border-color: var(--border-card); }
+.bg-card-alt { background: var(--bg-card-alt); border-color: var(--border-card); }
+.bg-card-solid { background: var(--bg-card-solid); border-color: var(--border-modal); }
+.bg-input { background: var(--bg-input); border-color: var(--border-input); color: var(--text-primary); }
+.bg-input::placeholder { color: var(--text-placeholder); }
+.bg-nav { background: var(--bg-nav); border-color: var(--border-nav); }
+.bg-overlay { background: var(--bg-overlay); }
+.bg-btn-sec { background: var(--bg-btn-secondary); color: var(--text-secondary); }
+.bg-btn-sec:hover { background: var(--bg-btn-secondary-hover); }
+.bg-hover:hover { background: var(--bg-hover); }
+.text-heading { color: var(--text-primary); }
+.text-body { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-faint { color: var(--text-faint); }
+.border-themed { border-color: var(--border-card); }
+.border-input-themed { border-color: var(--border-input); }
+.border-modal-themed { border-color: var(--border-modal); }
+
+/* ── Animations ── */
+@keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
