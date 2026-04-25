@@ -17,8 +17,8 @@ export default defineConfig({
         background_color: '#020617',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: '/Workshop-Manager/',
+        start_url: '/Workshop-Manager/',
         icons: [
           {
             src: 'icons/icon-192x192.png',
