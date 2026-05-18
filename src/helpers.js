@@ -8,6 +8,44 @@ export const LS = {
   set: (k, v) => localStorage.setItem(k, JSON.stringify(v))
 };
 
+export const DATA_VERSION = 2;
+
+export const WORKSHOP_COLORS = ['#3b82f6','#ef4444','#22c55e','#f59e0b','#a855f7','#ec4899','#14b8a6','#f97316'];
+
+// Migrate v1 data (no workshopId) to v2 (multi-workshop)
+export const migrateToV2 = (lang = 'en') => {
+  if (LS.get('workshop_data_version', 0) >= 2) return null;
+  const defaultWs = {
+    id: genId(),
+    name: lang === 'tr' ? 'Varsayılan Atölye' : 'Default Workshop',
+    color: '#3b82f6',
+    createdAt: new Date().toISOString()
+  };
+  // Patch existing assets
+  const assets = LS.get('workshop_assets', []);
+  if (assets.length > 0) {
+    LS.set('workshop_assets', assets.map(a => a.workshopId ? a : { ...a, workshopId: defaultWs.id }));
+  }
+  // Patch existing categories
+  const cats = LS.get('workshop_categories', []);
+  if (cats.length > 0) {
+    LS.set('workshop_categories', cats.map(c => c.workshopId ? c : { ...c, workshopId: defaultWs.id }));
+  }
+  // Patch existing checkouts
+  const checkouts = LS.get('workshop_checkouts', []);
+  if (checkouts.length > 0) {
+    LS.set('workshop_checkouts', checkouts.map(c => c.workshopId ? c : { ...c, workshopId: defaultWs.id }));
+  }
+  // Save workshops and version
+  const existingWorkshops = LS.get('workshop_workshops', []);
+  if (existingWorkshops.length === 0) {
+    LS.set('workshop_workshops', [defaultWs]);
+    LS.set('workshop_active_workshop', defaultWs.id);
+  }
+  LS.set('workshop_data_version', 2);
+  return defaultWs;
+};
+
 export const SEED_CATEGORIES = [
   { id: 'cat1', name: 'Hand Tools', color: '#f59e0b' },
   { id: 'cat2', name: 'Power Tools', color: '#ef4444' },
@@ -52,3 +90,7 @@ export const makeSeedCheckouts = () => {
 };
 
 export const TEAM_COLORS = ['#ef4444','#f59e0b','#22c55e','#3b82f6','#a855f7','#ec4899','#14b8a6','#f97316'];
+
+export const makeDefaultWorkshop = (name, color = '#3b82f6') => ({
+  id: genId(), name, color, createdAt: new Date().toISOString()
+});

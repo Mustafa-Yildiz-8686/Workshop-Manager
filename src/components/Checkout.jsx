@@ -3,7 +3,7 @@ import { Search, ChevronLeft, ClipboardList, RotateCcw } from 'lucide-react';
 import { Badge, Btn, Input, EmptyState, ConfirmDialog } from './UI';
 import { genId, today, addDays, daysDiff } from '../helpers';
 
-const CheckoutScreen = ({ assets, teams, checkouts, setCheckouts, categories, showToast, t }) => {
+const CheckoutScreen = ({ assets, teams, checkouts, setCheckouts, categories, showToast, t, activeWorkshopId, canWrite }) => {
   const [mode, setMode] = useState('menu');
   const [step, setStep] = useState(1);
   const [selectedAsset, setSelectedAsset] = useState(null);
@@ -26,7 +26,7 @@ const CheckoutScreen = ({ assets, teams, checkouts, setCheckouts, categories, sh
   const submitCheckout = () => {
     const dur = useCustom ? parseInt(customDays) || 1 : durationDays;
     const now = new Date();
-    const co = { id: genId(), assetId: selectedAsset.id, assetName: selectedAsset.name, teamId: selectedTeam.id, teamName: selectedTeam.name, memberId: selectedMember.id, memberName: selectedMember.name, quantity: qty, checkoutDate: now.toISOString(), dueDateDays: dur, dueDate: addDays(now, dur).toISOString(), returnedDate: null, status: 'active', notes };
+    const co = { id: genId(), assetId: selectedAsset.id, assetName: selectedAsset.name, teamId: selectedTeam.id, teamName: selectedTeam.name, memberId: selectedMember.id, memberName: selectedMember.name, quantity: qty, checkoutDate: now.toISOString(), dueDateDays: dur, dueDate: addDays(now, dur).toISOString(), returnedDate: null, status: 'active', notes, workshopId: activeWorkshopId };
     setCheckouts(p => [...p, co]);
     showToast(t('checkoutSuccess'));
     reset();
@@ -40,11 +40,11 @@ const CheckoutScreen = ({ assets, teams, checkouts, setCheckouts, categories, sh
     return (
       <div className="space-y-4">
         <h1 className="text-2xl font-bold text-heading">{t('checkout')}</h1>
-        <button onClick={() => setMode('new')} className="w-full bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl p-5 text-left hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-600/20">
-          <div className="flex items-center gap-3"><div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center"><ClipboardList size={24} /></div><div><p className="font-bold text-lg">{t('newCheckout')}</p><p className="text-sm text-blue-200 mt-0.5">{t('selectAsset')}</p></div></div>
+        <button onClick={() => { if (!canWrite) { showToast(t('offlineReadOnly')); return; } setMode('new'); }} className={`w-full rounded-2xl p-5 text-left transition-all shadow-lg ${canWrite ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-400 shadow-blue-600/20' : 'bg-card border text-faint cursor-not-allowed shadow-none'}`}>
+          <div className="flex items-center gap-3"><div className={`w-12 h-12 rounded-xl flex items-center justify-center ${canWrite ? 'bg-white/20' : 'bg-card-alt'}`}><ClipboardList size={24} /></div><div><p className="font-bold text-lg">{t('newCheckout')}</p><p className={`text-sm mt-0.5 ${canWrite ? 'text-blue-200' : 'text-faint'}`}>{canWrite ? t('selectAsset') : t('offlineReadOnly')}</p></div></div>
         </button>
-        <button onClick={() => setMode('return')} className="w-full bg-gradient-to-r from-emerald-600 to-emerald-500 text-white rounded-2xl p-5 text-left hover:from-emerald-500 hover:to-emerald-400 transition-all shadow-lg shadow-emerald-600/20">
-          <div className="flex items-center gap-3"><div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center"><RotateCcw size={24} /></div><div><p className="font-bold text-lg">{t('returnAsset')}</p><p className="text-sm text-emerald-200 mt-0.5">{t('selectCheckout')}</p></div></div>
+        <button onClick={() => { if (!canWrite) { showToast(t('offlineReadOnly')); return; } setMode('return'); }} className={`w-full rounded-2xl p-5 text-left transition-all shadow-lg ${canWrite ? 'bg-gradient-to-r from-emerald-600 to-emerald-500 text-white hover:from-emerald-500 hover:to-emerald-400 shadow-emerald-600/20' : 'bg-card border text-faint cursor-not-allowed shadow-none'}`}>
+          <div className="flex items-center gap-3"><div className={`w-12 h-12 rounded-xl flex items-center justify-center ${canWrite ? 'bg-white/20' : 'bg-card-alt'}`}><RotateCcw size={24} /></div><div><p className="font-bold text-lg">{t('returnAsset')}</p><p className={`text-sm mt-0.5 ${canWrite ? 'text-emerald-200' : 'text-faint'}`}>{canWrite ? t('selectCheckout') : t('offlineReadOnly')}</p></div></div>
         </button>
       </div>
     );

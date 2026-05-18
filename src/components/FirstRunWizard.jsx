@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Users, Package, ChevronRight, Sparkles } from 'lucide-react';
+import { Plus, Trash2, Users, Package, ChevronRight, Sparkles, Factory } from 'lucide-react';
 import { Btn, Input } from './UI';
-import { genId, TEAM_COLORS, SEED_CATEGORIES } from '../helpers';
+import { genId, TEAM_COLORS, WORKSHOP_COLORS, SEED_CATEGORIES } from '../helpers';
 
 const FirstRunWizard = ({ onComplete, t }) => {
   const [step, setStep] = useState(0);
+  const [wizWorkshop, setWizWorkshop] = useState({ name: '', color: '#3b82f6' });
   const [wizTeams, setWizTeams] = useState([]);
   const [wizAssets, setWizAssets] = useState([]);
   const [teamForm, setTeamForm] = useState({ name: '', color: '#3b82f6' });
@@ -40,14 +41,18 @@ const FirstRunWizard = ({ onComplete, t }) => {
   const removeAsset = (id) => setWizAssets(p => p.filter(a => a.id !== id));
 
   const finish = () => {
-    onComplete({ teams: wizTeams, assets: wizAssets, categories: SEED_CATEGORIES });
+    const wsName = wizWorkshop.name.trim() || t('defaultWorkshop');
+    const workshop = { id: genId(), name: wsName, color: wizWorkshop.color, createdAt: new Date().toISOString() };
+    onComplete({ workshop, teams: wizTeams, assets: wizAssets, categories: SEED_CATEGORIES });
   };
 
   const skip = () => {
-    onComplete({ teams: [], assets: [], categories: SEED_CATEGORIES });
+    const workshop = { id: genId(), name: t('defaultWorkshop'), color: '#3b82f6', createdAt: new Date().toISOString() };
+    onComplete({ workshop, teams: [], assets: [], categories: SEED_CATEGORIES });
   };
 
   const totalMembers = wizTeams.reduce((s, t2) => s + t2.members.length, 0);
+  const TOTAL_STEPS = 5;
 
   // Step 0: Welcome
   if (step === 0) {
@@ -70,12 +75,43 @@ const FirstRunWizard = ({ onComplete, t }) => {
     );
   }
 
-  // Step 1: Add Teams
+  // Step 1: Name Your Workshop (NEW)
   if (step === 1) {
     return (
       <div className="min-h-screen bg-app p-6 pb-24">
         <div className="max-w-md mx-auto space-y-6" style={{animation: 'fadeIn 0.3s ease'}}>
-          <div className="flex items-center gap-2 mb-2">{[1,2,3,4].map(s => (<div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${s <= 1 ? 'bg-blue-500' : 'bg-card'}`} />))}</div>
+          <div className="flex items-center gap-2 mb-2">{Array.from({length: TOTAL_STEPS}, (_, i) => (<div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i < 1 ? 'bg-blue-500' : 'bg-card'}`} />))}</div>
+          <div className="w-16 h-16 bg-blue-600/20 rounded-2xl flex items-center justify-center">
+            <Factory size={32} className="text-blue-400" />
+          </div>
+          <h2 className="text-2xl font-bold text-heading">{t('workshopName')}</h2>
+          <p className="text-sm text-muted">{t('welcomeSubtitle')}</p>
+
+          <div className="space-y-4">
+            <Input label={t('workshopName')} value={wizWorkshop.name} onChange={e => setWizWorkshop(p => ({ ...p, name: e.target.value }))} placeholder={t('defaultWorkshop')} />
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-body">{t('workshopColor')}</label>
+              <div className="flex gap-2 flex-wrap">
+                {WORKSHOP_COLORS.map(clr => (<button key={clr} onClick={() => setWizWorkshop(p => ({ ...p, color: clr }))} className={`w-8 h-8 rounded-full border-2 transition-transform ${wizWorkshop.color === clr ? 'border-blue-400 scale-110' : 'border-transparent'}`} style={{ backgroundColor: clr }} />))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <Btn variant="secondary" className="flex-1" onClick={() => setStep(0)}>{t('back')}</Btn>
+            <Btn className="flex-1" onClick={() => setStep(2)}>{t('next')}</Btn>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Step 2: Add Teams
+  if (step === 2) {
+    return (
+      <div className="min-h-screen bg-app p-6 pb-24">
+        <div className="max-w-md mx-auto space-y-6" style={{animation: 'fadeIn 0.3s ease'}}>
+          <div className="flex items-center gap-2 mb-2">{Array.from({length: TOTAL_STEPS}, (_, i) => (<div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i < 2 ? 'bg-blue-500' : 'bg-card'}`} />))}</div>
           <h2 className="text-2xl font-bold text-heading">{t('setupTeams')}</h2>
 
           <div className="space-y-3">
@@ -100,20 +136,20 @@ const FirstRunWizard = ({ onComplete, t }) => {
           )}
 
           <div className="flex gap-3 pt-4">
-            <Btn variant="secondary" className="flex-1" onClick={() => setStep(0)}>{t('back')}</Btn>
-            <Btn className="flex-1" onClick={() => setStep(2)}>{t('next')}</Btn>
+            <Btn variant="secondary" className="flex-1" onClick={() => setStep(1)}>{t('back')}</Btn>
+            <Btn className="flex-1" onClick={() => setStep(3)}>{t('next')}</Btn>
           </div>
         </div>
       </div>
     );
   }
 
-  // Step 2: Add Members
-  if (step === 2) {
+  // Step 3: Add Members
+  if (step === 3) {
     return (
       <div className="min-h-screen bg-app p-6 pb-24">
         <div className="max-w-md mx-auto space-y-6" style={{animation: 'fadeIn 0.3s ease'}}>
-          <div className="flex items-center gap-2 mb-2">{[1,2,3,4].map(s => (<div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${s <= 2 ? 'bg-blue-500' : 'bg-card'}`} />))}</div>
+          <div className="flex items-center gap-2 mb-2">{Array.from({length: TOTAL_STEPS}, (_, i) => (<div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i < 3 ? 'bg-blue-500' : 'bg-card'}`} />))}</div>
           <h2 className="text-2xl font-bold text-heading">{t('setupPeople')}</h2>
 
           {wizTeams.length === 0 ? (
@@ -143,20 +179,20 @@ const FirstRunWizard = ({ onComplete, t }) => {
           )}
 
           <div className="flex gap-3 pt-4">
-            <Btn variant="secondary" className="flex-1" onClick={() => setStep(1)}>{t('back')}</Btn>
-            <Btn className="flex-1" onClick={() => setStep(3)}>{t('next')}</Btn>
+            <Btn variant="secondary" className="flex-1" onClick={() => setStep(2)}>{t('back')}</Btn>
+            <Btn className="flex-1" onClick={() => setStep(4)}>{t('next')}</Btn>
           </div>
         </div>
       </div>
     );
   }
 
-  // Step 3: Add Items
-  if (step === 3) {
+  // Step 4: Add Items
+  if (step === 4) {
     return (
       <div className="min-h-screen bg-app p-6 pb-24">
         <div className="max-w-md mx-auto space-y-6" style={{animation: 'fadeIn 0.3s ease'}}>
-          <div className="flex items-center gap-2 mb-2">{[1,2,3,4].map(s => (<div key={s} className={`h-1.5 flex-1 rounded-full transition-colors ${s <= 3 ? 'bg-blue-500' : 'bg-card'}`} />))}</div>
+          <div className="flex items-center gap-2 mb-2">{Array.from({length: TOTAL_STEPS}, (_, i) => (<div key={i} className={`h-1.5 flex-1 rounded-full transition-colors ${i < 4 ? 'bg-blue-500' : 'bg-card'}`} />))}</div>
           <h2 className="text-2xl font-bold text-heading">{t('setupItems')}</h2>
 
           <div className="space-y-3">
@@ -184,15 +220,16 @@ const FirstRunWizard = ({ onComplete, t }) => {
           )}
 
           <div className="flex gap-3 pt-4">
-            <Btn variant="secondary" className="flex-1" onClick={() => setStep(2)}>{t('back')}</Btn>
-            <Btn className="flex-1" onClick={() => setStep(4)}>{t('next')}</Btn>
+            <Btn variant="secondary" className="flex-1" onClick={() => setStep(3)}>{t('back')}</Btn>
+            <Btn className="flex-1" onClick={() => setStep(5)}>{t('next')}</Btn>
           </div>
         </div>
       </div>
     );
   }
 
-  // Step 4: Summary
+  // Step 5: Summary
+  const wsName = wizWorkshop.name.trim() || t('defaultWorkshop');
   return (
     <div className="min-h-screen bg-app flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-8" style={{animation: 'fadeIn 0.5s ease'}}>
@@ -201,16 +238,17 @@ const FirstRunWizard = ({ onComplete, t }) => {
         </div>
         <div>
           <h1 className="text-3xl font-bold text-heading mb-3">{t('setupDone')}</h1>
-          <p className="text-muted text-base mb-6">{t('setupSummary')}</p>
-          <div className="flex justify-center gap-6 text-sm">
-            <div><p className="text-2xl font-bold text-blue-400">{wizTeams.length}</p><p className="text-muted">{t('teamsCount')}</p></div>
-            <div><p className="text-2xl font-bold text-emerald-400">{totalMembers}</p><p className="text-muted">{t('membersCount')}</p></div>
-            <div><p className="text-2xl font-bold text-amber-400">{wizAssets.length}</p><p className="text-muted">{t('itemsCount')}</p></div>
-          </div>
+          <p className="text-muted text-base mb-2">{t('setupSummary')}</p>
+          <p className="text-sm font-medium" style={{ color: wizWorkshop.color }}>{t('workshop')}: {wsName}</p>
+        </div>
+        <div className="flex justify-center gap-6 text-sm">
+          <div><p className="text-2xl font-bold text-blue-400">{wizTeams.length}</p><p className="text-muted">{t('teamsCount')}</p></div>
+          <div><p className="text-2xl font-bold text-emerald-400">{totalMembers}</p><p className="text-muted">{t('membersCount')}</p></div>
+          <div><p className="text-2xl font-bold text-amber-400">{wizAssets.length}</p><p className="text-muted">{t('itemsCount')}</p></div>
         </div>
         <div className="space-y-3">
           <Btn className="w-full !py-3.5 !text-base" onClick={finish}>{t('letsGo')}</Btn>
-          <button onClick={() => setStep(3)} className="text-sm text-muted hover:text-heading transition-colors">{t('back')}</button>
+          <button onClick={() => setStep(4)} className="text-sm text-muted hover:text-heading transition-colors">{t('back')}</button>
         </div>
       </div>
     </div>

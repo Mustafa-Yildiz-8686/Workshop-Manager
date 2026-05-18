@@ -64,6 +64,32 @@ const translations = {
     photo: "Photo", addPhoto: "Add Photo", removePhoto: "Remove Photo",
     // Empty states
     noTeams: "No teams yet. Create your first!",
+    // Workshops
+    workshops: "Workshops", workshop: "Workshop",
+    addWorkshop: "Add Workshop", editWorkshop: "Edit Workshop", deleteWorkshop: "Delete Workshop",
+    workshopName: "Workshop Name", workshopColor: "Workshop Color",
+    workshopAdded: "Workshop added", workshopDeleted: "Workshop deleted",
+    workshopRenamed: "Workshop renamed", workshopUpdated: "Workshop updated",
+    workshopHasActiveCheckouts: "This workshop has active checkouts. Return them first.",
+    deleteWorkshopConfirm: "Delete this workshop and ALL its assets, categories, and history?",
+    noWorkshops: "No workshops yet. Create your first!",
+    defaultWorkshop: "Default Workshop",
+    switchWorkshop: "Switch Workshop",
+    // Sync
+    sync: "Sync", createRoom: "Create Room", joinRoom: "Join Room",
+    roomCode: "Room Code", enterRoomCode: "Enter room code",
+    connected: "Connected", connecting: "Connecting...",
+    disconnect: "Disconnect", disconnected: "Disconnected",
+    roomCreated: "Room created!", roomJoined: "Joined room!",
+    roomNotFound: "Room not found", syncEnabled: "Sync active",
+    copyCode: "Copy Code", codeCopied: "Code copied!",
+    password: "Password", enterPassword: "Enter a password",
+    passwordRequired: "Password is required", wrongPassword: "Wrong password",
+    unlock: "Unlock", or: "or",
+    admin: "Admin",
+    // Offline
+    online: "Online", offline: "Offline",
+    offlineReadOnly: "Offline — view only",
   },
   tr: {
     dashboard: "Gösterge Paneli", assets: "Ekipmanlar", checkout: "Zimmet", teams: "Ekipler", history: "Geçmiş",
@@ -130,6 +156,32 @@ const translations = {
     photo: "Fotoğraf", addPhoto: "Fotoğraf Ekle", removePhoto: "Fotoğrafı Kaldır",
     // Empty states
     noTeams: "Henüz ekip yok. İlkini oluşturun!",
+    // Workshops
+    workshops: "Atölyeler", workshop: "Atölye",
+    addWorkshop: "Atölye Ekle", editWorkshop: "Atölye Düzenle", deleteWorkshop: "Atölye Sil",
+    workshopName: "Atölye Adı", workshopColor: "Atölye Rengi",
+    workshopAdded: "Atölye eklendi", workshopDeleted: "Atölye silindi",
+    workshopRenamed: "Atölye yeniden adlandırıldı", workshopUpdated: "Atölye güncellendi",
+    workshopHasActiveCheckouts: "Bu atölyenin aktif zimmetleri var. Önce iade edin.",
+    deleteWorkshopConfirm: "Bu atölye ve TÜM ekipmanları, kategorileri ve geçmişi silinsin mi?",
+    noWorkshops: "Henüz atölye yok. İlkini oluşturun!",
+    defaultWorkshop: "Varsayılan Atölye",
+    switchWorkshop: "Atölye Değiştir",
+    // Sync
+    sync: "Senkronizasyon", createRoom: "Oda Oluştur", joinRoom: "Odaya Katıl",
+    roomCode: "Oda Kodu", enterRoomCode: "Oda kodunu girin",
+    connected: "Bağlı", connecting: "Bağlanıyor...",
+    disconnect: "Bağlantıyı Kes", disconnected: "Bağlı Değil",
+    roomCreated: "Oda oluşturuldu!", roomJoined: "Odaya katıldınız!",
+    roomNotFound: "Oda bulunamadı", syncEnabled: "Senkronizasyon aktif",
+    copyCode: "Kodu Kopyala", codeCopied: "Kod kopyalandı!",
+    password: "Şifre", enterPassword: "Bir şifre girin",
+    passwordRequired: "Şifre gerekli", wrongPassword: "Yanlış şifre",
+    unlock: "Kilidi Aç", or: "veya",
+    admin: "Yönetim",
+    // Offline
+    online: "Çevrimiçi", offline: "Çevrimdışı",
+    offlineReadOnly: "Çevrimdışı — sadece görüntüleme",
   }
 };
 

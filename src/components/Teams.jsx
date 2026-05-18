@@ -3,7 +3,7 @@ import { Users, ChevronLeft, ChevronRight, Plus, Edit2, Trash2, Check, X } from 
 import { Modal, ConfirmDialog, Btn, Input, EmptyState } from './UI';
 import { genId, today, daysDiff, TEAM_COLORS } from '../helpers';
 
-const TeamsScreen = ({ teams, setTeams, checkouts, setCheckouts, showToast, t }) => {
+const TeamsScreen = ({ teams, setTeams, checkouts, setCheckouts, showToast, t, canWrite }) => {
   const [selectedTeam, setSelectedTeam] = useState(null);
   const [editName, setEditName] = useState('');
   const [isEditing, setIsEditing] = useState(false);
@@ -58,7 +58,7 @@ const TeamsScreen = ({ teams, setTeams, checkouts, setCheckouts, showToast, t })
           {isEditing ? (
             <div className="flex gap-2"><input value={editName} onChange={e => setEditName(e.target.value)} className="flex-1 px-3 py-2 rounded-xl bg-input border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /><Btn onClick={() => renameTm(tm)}><Check size={16} /></Btn><Btn variant="ghost" onClick={() => setIsEditing(false)}><X size={16} /></Btn></div>
           ) : (
-            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full" style={{ backgroundColor: tm.color }} /><h2 className="text-xl font-bold text-heading flex-1">{tm.name}</h2><button onClick={() => { setEditName(tm.name); setIsEditing(true); }} className="p-2 rounded-lg bg-btn-sec"><Edit2 size={16} /></button><button onClick={() => setConfirmDelTeam(tm.id)} className="p-2 rounded-lg bg-btn-sec text-red-400"><Trash2 size={16} /></button></div>
+            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full" style={{ backgroundColor: tm.color }} /><h2 className="text-xl font-bold text-heading flex-1">{tm.name}</h2>{canWrite && <><button onClick={() => { setEditName(tm.name); setIsEditing(true); }} className="p-2 rounded-lg bg-btn-sec"><Edit2 size={16} /></button><button onClick={() => setConfirmDelTeam(tm.id)} className="p-2 rounded-lg bg-btn-sec text-red-400"><Trash2 size={16} /></button></>}</div>
           )}
           <div className="flex gap-4 mt-3 text-sm"><span className="text-muted">{tm.members.length} {t('members')}</span><span className="text-amber-400">{tCheckouts.length} {t('checkedOut')}</span></div>
         </div>
@@ -66,10 +66,10 @@ const TeamsScreen = ({ teams, setTeams, checkouts, setCheckouts, showToast, t })
         <section><h3 className="text-sm font-bold text-body uppercase tracking-wide mb-2">{t('members')}</h3>
           {tm.members.length === 0 ? <p className="text-sm text-faint">{t('noMembers')}</p> : (
             <div className="space-y-2">{tm.members.map(m => (
-              <div key={m.id} className="flex items-center gap-3 bg-card-alt rounded-xl p-3 border"><Users size={16} className="text-faint" /><span className="flex-1 text-sm text-heading">{m.name}</span><button onClick={() => setConfirmDel(m.id)} className="p-1 text-muted hover:text-red-400"><Trash2 size={14} /></button></div>
+              <div key={m.id} className="flex items-center gap-3 bg-card-alt rounded-xl p-3 border"><Users size={16} className="text-faint" /><span className="flex-1 text-sm text-heading">{m.name}</span>{canWrite && <button onClick={() => setConfirmDel(m.id)} className="p-1 text-muted hover:text-red-400"><Trash2 size={14} /></button>}</div>
             ))}</div>
           )}
-          <div className="flex gap-2 mt-3"><input value={newMember} onChange={e => setNewMember(e.target.value)} placeholder={t('memberName')} onKeyDown={e => e.key === 'Enter' && addMbr(tm)} className="flex-1 px-3 py-2.5 rounded-xl bg-input border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /><Btn onClick={() => addMbr(tm)}><Plus size={16} /></Btn></div>
+          {canWrite && <div className="flex gap-2 mt-3"><input value={newMember} onChange={e => setNewMember(e.target.value)} placeholder={t('memberName')} onKeyDown={e => e.key === 'Enter' && addMbr(tm)} className="flex-1 px-3 py-2.5 rounded-xl bg-input border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /><Btn onClick={() => addMbr(tm)}><Plus size={16} /></Btn></div>}
         </section>
 
         {tCheckouts.length > 0 && <section><h3 className="text-sm font-bold text-body uppercase tracking-wide mb-2">{t('currentCheckouts')}</h3><div className="space-y-2">{tCheckouts.map(c => { const dl = daysDiff(c.dueDate, today()); return (
@@ -92,7 +92,7 @@ const TeamsScreen = ({ teams, setTeams, checkouts, setCheckouts, showToast, t })
         ); })}</div>
       )}
 
-      <button onClick={() => setShowAddTeam(true)} className="fixed bottom-20 right-4 w-14 h-14 bg-blue-600 rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center text-white hover:bg-blue-500 transition-colors z-30"><Plus size={24} /></button>
+      {canWrite && <button onClick={() => setShowAddTeam(true)} className="fixed bottom-20 right-4 w-14 h-14 bg-blue-600 rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center text-white hover:bg-blue-500 transition-colors z-30"><Plus size={24} /></button>}
 
       <Modal open={showAddTeam} onClose={() => setShowAddTeam(false)} title={t('addTeam')}>
         <div className="space-y-4">

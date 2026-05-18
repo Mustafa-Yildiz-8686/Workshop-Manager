@@ -92,6 +92,10 @@ body {
 .border-input-themed { border-color: var(--border-input); }
 .border-modal-themed { border-color: var(--border-modal); }
 
+/* ── Workshop switcher ── */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ── Animations ── */
 @keyframes slideDown { from { opacity: 0; transform: translate(-50%, -20px); } to { opacity: 1; transform: translate(-50%, 0); } }
 @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }

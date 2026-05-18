@@ -3,7 +3,7 @@ import { Package, Clock, AlertTriangle, RotateCcw } from 'lucide-react';
 import { EmptyState } from './UI';
 import { today, daysDiff, fmtDate } from '../helpers';
 
-const DashboardScreen = ({ assets, checkouts, categories, teams, onReturn, t, lang }) => {
+const DashboardScreen = ({ assets, checkouts, categories, teams, onReturn, t, lang, workshopName, canWrite }) => {
   const now = today();
   const activeCheckouts = checkouts.filter(c => !c.returnedDate);
   const overdueList = activeCheckouts.filter(c => new Date(c.dueDate) < now);
@@ -32,7 +32,7 @@ const DashboardScreen = ({ assets, checkouts, categories, teams, onReturn, t, la
             {daysLeft < 0 ? `${Math.abs(daysLeft)} ${t('daysOverdue')}` : `${daysLeft} ${t('daysRemaining')}`} · qty: {co.quantity}
           </p>
         </div>
-        <button onClick={() => onReturn(co)} className="shrink-0 px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 text-xs font-semibold hover:bg-emerald-600/30 transition-colors">
+        <button onClick={() => onReturn(co)} disabled={!canWrite} className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${canWrite ? 'bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30' : 'bg-card-alt text-faint cursor-not-allowed'}`}>
           <RotateCcw size={14} className="inline mr-1" />{t('markReturned')}
         </button>
       </div>
@@ -41,7 +41,10 @@ const DashboardScreen = ({ assets, checkouts, categories, teams, onReturn, t, la
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-heading">{t('dashboard')}</h1>
+      <div className="flex items-baseline gap-3">
+        <h1 className="text-2xl font-bold text-heading">{t('dashboard')}</h1>
+        {workshopName && <span className="text-sm text-muted font-medium">— {workshopName}</span>}
+      </div>
       <div className="grid grid-cols-2 gap-3">
         <StatCard label={t('totalAssets')} value={totalQty} color="#60a5fa" />
         <StatCard label={t('checkedOut')} value={outQty} color="#f59e0b" />

@@ -22,7 +22,7 @@ const resizeImage = (file, maxSize = 400) => new Promise((resolve) => {
   reader.readAsDataURL(file);
 });
 
-const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories, setCheckouts, showToast, t }) => {
+const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories, setCheckouts, showToast, t, activeWorkshopId, canWrite }) => {
   const [search, setSearch] = useState('');
   const [selectedAsset, setSelectedAsset] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -55,7 +55,7 @@ const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories,
       }
       showToast(t('assetUpdated'));
     } else {
-      setAssets(p => [...p, { id: genId(), ...form, createdAt: new Date().toISOString() }]);
+      setAssets(p => [...p, { id: genId(), ...form, workshopId: activeWorkshopId, createdAt: new Date().toISOString() }]);
       showToast(t('assetAdded'));
     }
     setShowForm(false);
@@ -75,7 +75,7 @@ const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories,
   };
 
   const [catFormData, setCatFormData] = useState({ name: '', color: '#3b82f6' });
-  const saveCat = () => { if (!catFormData.name.trim()) return; if (catForm?.id) { setCategories(p => p.map(c => c.id === catForm.id ? { ...c, ...catFormData } : c)); showToast(t('categoryUpdated')); } else { setCategories(p => [...p, { id: genId(), ...catFormData }]); showToast(t('categoryAdded')); } setCatForm(null); };
+  const saveCat = () => { if (!catFormData.name.trim()) return; if (catForm?.id) { setCategories(p => p.map(c => c.id === catForm.id ? { ...c, ...catFormData } : c)); showToast(t('categoryUpdated')); } else { setCategories(p => [...p, { id: genId(), ...catFormData, workshopId: activeWorkshopId }]); showToast(t('categoryAdded')); } setCatForm(null); };
   const deleteCat = (id) => { setCategories(p => p.filter(c => c.id !== id)); showToast(t('categoryDeleted')); };
 
   if (selectedAsset) {
@@ -92,7 +92,7 @@ const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories,
           {a.photo && <img src={a.photo} alt={a.name} className="w-full h-48 object-cover rounded-xl mb-4" />}
           <div className="flex items-start justify-between mb-3">
             <div><h2 className="text-xl font-bold text-heading">{a.name}</h2>{cat && <Badge color={cat.color}>{cat.name}</Badge>}</div>
-            <div className="flex gap-2"><button onClick={() => openEdit(a)} className="p-2 rounded-lg bg-btn-sec"><Edit2 size={16} /></button><button onClick={() => setConfirmDel(a.id)} className="p-2 rounded-lg bg-btn-sec text-red-400"><Trash2 size={16} /></button></div>
+            <div>{canWrite && <div className="flex gap-2"><button onClick={() => openEdit(a)} className="p-2 rounded-lg bg-btn-sec"><Edit2 size={16} /></button><button onClick={() => setConfirmDel(a.id)} className="p-2 rounded-lg bg-btn-sec text-red-400"><Trash2 size={16} /></button></div>}</div>
           </div>
           {a.description && <p className="text-sm text-muted mb-3">{a.description}</p>}
           <div className="flex gap-4 text-sm"><span className="text-muted">Total: <span className="text-heading font-semibold">{a.totalQuantity}</span></span><span className="text-emerald-400">{t('available')}: {avail}</span><span className="text-amber-400">{t('checkedOut')}: {a.totalQuantity - avail}</span></div>
@@ -110,7 +110,7 @@ const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories,
 
   return (
     <div className="space-y-4 pb-20">
-      <div className="flex items-center justify-between"><h1 className="text-2xl font-bold text-heading">{t('assets')}</h1><button onClick={() => setShowCatMgmt(true)} className="text-xs text-blue-400 hover:text-blue-300 font-medium">{t('categoryMgmt')}</button></div>
+      <div className="flex items-center justify-between"><h1 className="text-2xl font-bold text-heading">{t('assets')}</h1>{canWrite && <button onClick={() => setShowCatMgmt(true)} className="text-xs text-blue-400 hover:text-blue-300 font-medium">{t('categoryMgmt')}</button>}</div>
       <div className="relative"><Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-faint" /><input value={search} onChange={e => setSearch(e.target.value)} placeholder={t('search')} className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-input border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
       {filtered.length === 0 ? <EmptyState icon={Package} message={t('noAssets')} /> : (
         <div className="space-y-2">{filtered.map(a => { const cat = categories.find(c => c.id === a.category); const avail = getAvailable(a); return (
@@ -125,7 +125,7 @@ const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories,
           </button>
         ); })}</div>
       )}
-      <button onClick={openAdd} className="fixed bottom-20 right-4 w-14 h-14 bg-blue-600 rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center text-white hover:bg-blue-500 transition-colors z-30"><Plus size={24} /></button>
+      {canWrite && <button onClick={openAdd} className="fixed bottom-20 right-4 w-14 h-14 bg-blue-600 rounded-2xl shadow-lg shadow-blue-600/30 flex items-center justify-center text-white hover:bg-blue-500 transition-colors z-30"><Plus size={24} /></button>}
 
       <Modal open={showForm} onClose={() => setShowForm(false)} title={editAsset ? t('editAsset') : t('addAsset')}>
         <div className="space-y-4">

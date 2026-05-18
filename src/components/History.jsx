@@ -3,7 +3,7 @@ import { Clock } from 'lucide-react';
 import { Badge, EmptyState } from './UI';
 import { today, daysDiff, fmtDate } from '../helpers';
 
-const HistoryScreen = ({ checkouts, teams, t, lang }) => {
+const HistoryScreen = ({ checkouts, teams, t, lang, workshopName }) => {
   const [filterTeam, setFilterTeam] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const now = today();
@@ -22,7 +22,10 @@ const HistoryScreen = ({ checkouts, teams, t, lang }) => {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold text-heading">{t('history')}</h1>
+      <div className="flex items-baseline gap-3">
+        <h1 className="text-2xl font-bold text-heading">{t('history')}</h1>
+        {workshopName && <span className="text-sm text-muted font-medium">— {workshopName}</span>}
+      </div>
       <div className="flex gap-2">
         <select value={filterTeam} onChange={e => setFilterTeam(e.target.value)} className="flex-1 px-3 py-2 rounded-xl bg-input border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="all">{t('filterByTeam')}</option>{teams.map(tm => <option key={tm.id} value={tm.id}>{tm.name}</option>)}
