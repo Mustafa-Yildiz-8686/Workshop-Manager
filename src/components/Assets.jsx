@@ -103,6 +103,30 @@ const AssetsScreen = ({ assets, categories, checkouts, setAssets, setCategories,
         {assetCheckouts.filter(c => c.returnedDate).length > 0 && <section><h3 className="text-sm font-bold text-body uppercase tracking-wide mb-2">{t('history')}</h3><div className="space-y-2">{assetCheckouts.filter(c => c.returnedDate).map(c => (
           <div key={c.id} className="bg-card-alt rounded-xl p-3 border"><p className="text-sm text-heading">{c.memberName} · {c.teamName}</p><p className="text-xs text-muted mt-1">Qty: {c.quantity} · {fmtDate(c.checkoutDate)} → {fmtDate(c.returnedDate)}</p></div>
         ))}</div></section>}
+        {/* Edit Modal (must be inside detail view since it early-returns) */}
+        <Modal open={showForm} onClose={() => setShowForm(false)} title={editAsset ? t('editAsset') : t('addAsset')}>
+          <div className="space-y-4">
+            <Input label={t('assetName')} value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} error={errors.name} />
+            <div className="space-y-1"><label className="text-sm font-medium text-body">{t('category')}</label><select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className="w-full px-3 py-2.5 rounded-xl bg-input border text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">{categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</select>{errors.category && <p className="text-xs text-red-400">{errors.category}</p>}</div>
+            <Input label={t('description')} value={form.description} onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
+            <Input label={t('quantity')} type="number" min="1" value={form.totalQuantity} onChange={e => setForm(p => ({ ...p, totalQuantity: parseInt(e.target.value) || 1 }))} error={errors.totalQuantity} />
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-body">{t('photo')}</label>
+              {form.photo ? (
+                <div className="relative inline-block">
+                  <img src={form.photo} alt="" className="w-24 h-24 rounded-xl object-cover" />
+                  <button onClick={() => setForm(p => ({ ...p, photo: null }))} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white"><XIcon size={12} /></button>
+                </div>
+              ) : (
+                <button onClick={() => fileRef.current?.click()} className="flex items-center gap-2 px-4 py-3 rounded-xl bg-card-alt border border-dashed text-sm text-muted hover:text-heading hover:border-blue-500/30 transition-colors w-full">
+                  <Camera size={18} />{t('addPhoto')}
+                </button>
+              )}
+              <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
+            </div>
+            <div className="flex gap-3 pt-2"><Btn variant="secondary" className="flex-1" onClick={() => setShowForm(false)}>{t('cancel')}</Btn><Btn className="flex-1" onClick={handleSave}>{t('save')}</Btn></div>
+          </div>
+        </Modal>
         <ConfirmDialog open={!!confirmDel} onClose={() => setConfirmDel(null)} onConfirm={() => handleDelete(confirmDel)} message={t('confirmDelete')} t={t} />
       </div>
     );
