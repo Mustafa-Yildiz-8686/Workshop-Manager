@@ -42,7 +42,7 @@ A mobile-first web app for tracking workshop equipment, team checkouts, and inve
 ### Development
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/Workshop-Manager.git
+git clone https://github.com/Mustafa-Yildiz-8686/Workshop-Manager.git
 cd Workshop-Manager
 npm install
 npm run dev
