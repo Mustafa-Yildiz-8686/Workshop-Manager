@@ -42,7 +42,8 @@ const App = () => {
   // Firebase sync hook
   const {
     roomCode, isOnline, syncStatus, syncEnabled,
-    createRoom, joinRoom, disconnect, verifyMasterPassword, canWrite
+    createRoom, joinRoom, disconnect, verifyMasterPassword, canWrite,
+    isAuthenticated
   } = useFirebaseSync({
     workshops, setWorkshops,
     assets, setAssets,
@@ -105,7 +106,6 @@ const App = () => {
   const toggleLang = () => setLang(p => p === 'en' ? 'tr' : 'en');
 
   // Sync actions
-  const [masterUnlocked, setMasterUnlocked] = useState(false);
 
   const handleVerifyPassword = async () => {
     if (!roomPassword.trim()) return;
@@ -113,7 +113,6 @@ const App = () => {
     const valid = await verifyMasterPassword(roomPassword);
     setSyncLoading(false);
     if (valid) {
-      setMasterUnlocked(true);
       setRoomPassword('');
     } else {
       showToast(t('wrongPassword'));
@@ -344,7 +343,7 @@ const App = () => {
             </>
           ) : (
             <>
-              {!masterUnlocked ? (
+              {!isAuthenticated ? (
                 <>
                   {/* Master password gate */}
                   <div className="bg-card-alt rounded-xl p-4 border text-center space-y-2">
@@ -441,7 +440,7 @@ const App = () => {
       </nav>
 
       <ConfirmDialog open={showResetConfirm} onClose={() => setShowResetConfirm(false)} onConfirm={handleReset} message={t('resetConfirm')} t={t} />
-      <AdminPanel open={showAdmin} onClose={() => setShowAdmin(false)} t={t} showToast={showToast} />
+      <AdminPanel open={showAdmin} onClose={() => setShowAdmin(false)} t={t} showToast={showToast} isAuthenticated={isAuthenticated} onSignIn={verifyMasterPassword} />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { ref, set, onValue, off, get } from 'firebase/database';
+import { signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { LS } from './helpers';
 
 // Generate a 6-char room code (no ambiguous chars like 0/O/1/I)
@@ -11,12 +12,6 @@ const generateRoomCode = () => {
   return code;
 };
 
-// SHA-256 hash using the browser's built-in Web Crypto API
-const hashPassword = async (password) => {
-  const encoded = new TextEncoder().encode(password);
-  const buffer = await crypto.subtle.digest('SHA-256', encoded);
-  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-};
 
 // Debounce helper — waits `ms` after last call before executing
 const debounce = (fn, ms) => {
@@ -43,6 +38,7 @@ const useFirebaseSync = ({
   const [roomCode, setRoomCode] = useState(() => LS.get('workshop_room_code', null));
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [syncStatus, setSyncStatus] = useState('disconnected'); // 'disconnected' | 'connecting' | 'connected'
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const isRemoteUpdate = useRef(false);
   const listenersAttached = useRef(false);
   const initialLoadDone = useRef(false); // true only after first remote snapshot on ALL paths
@@ -55,6 +51,14 @@ const useFirebaseSync = ({
     window.addEventListener('online', onOn);
     window.addEventListener('offline', onOff);
     return () => { window.removeEventListener('online', onOn); window.removeEventListener('offline', onOff); };
+  }, []);
+
+  // Track Firebase auth state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
   }, []);
 
   // Get a debounced push function for a given Firebase path
@@ -172,13 +176,16 @@ const useFirebaseSync = ({
     getDebouncedPusher('checkouts')(checkouts);
   }, [checkouts, roomCode, getDebouncedPusher]);
 
-  // Master password hash (SHA-256 of the master password, hardcoded)
-  const MASTER_HASH = 'bdce5c91c8783a99cfd136e4235d6789cfd24209983275d6080708237f1ea6db';
+  // Authenticate via Firebase Auth (server-side password verification)
+  const AUTH_EMAIL = 'admin@workshop.local';
 
-  // Verify master password against hardcoded hash
   const verifyMasterPassword = useCallback(async (password) => {
-    const hash = await hashPassword(password);
-    return hash === MASTER_HASH;
+    try {
+      await signInWithEmailAndPassword(auth, AUTH_EMAIL, password);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }, []);
 
   // Create a new room
@@ -233,6 +240,7 @@ const useFirebaseSync = ({
     disconnect,
     verifyMasterPassword,
     canWrite: !roomCode || isOnline,
+    isAuthenticated,
   };
 };
 

@@ -4,16 +4,9 @@ import { db } from '../firebase';
 import { ref, onValue, off, remove } from 'firebase/database';
 import { Modal, ConfirmDialog, Btn } from './UI';
 
-const MASTER_HASH = 'bdce5c91c8783a99cfd136e4235d6789cfd24209983275d6080708237f1ea6db';
 
-const hashPassword = async (password) => {
-  const encoded = new TextEncoder().encode(password);
-  const buffer = await crypto.subtle.digest('SHA-256', encoded);
-  return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-};
 
-const AdminPanel = ({ open, onClose, t, showToast }) => {
-  const [unlocked, setUnlocked] = useState(false);
+const AdminPanel = ({ open, onClose, t, showToast, isAuthenticated, onSignIn }) => {
   const [password, setPassword] = useState('');
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +14,7 @@ const AdminPanel = ({ open, onClose, t, showToast }) => {
 
   // Fetch rooms when unlocked
   useEffect(() => {
-    if (!open || !unlocked) return;
+    if (!open || !isAuthenticated) return;
     setLoading(true);
     const roomsRef = ref(db, 'rooms');
     const handler = onValue(roomsRef, (snapshot) => {
@@ -41,15 +34,13 @@ const AdminPanel = ({ open, onClose, t, showToast }) => {
       setLoading(false);
     }, () => setLoading(false));
     return () => off(roomsRef);
-  }, [open, unlocked]);
+  }, [open, isAuthenticated]);
 
   const handleUnlock = async () => {
-    const hash = await hashPassword(password);
-    if (hash === MASTER_HASH) {
-      setUnlocked(true);
-      setPassword('');
-    } else {
-      setPassword('');
+    if (!password.trim()) return;
+    const valid = await onSignIn(password);
+    setPassword('');
+    if (!valid) {
       showToast(t('wrongPassword'));
     }
   };
@@ -60,7 +51,6 @@ const AdminPanel = ({ open, onClose, t, showToast }) => {
   };
 
   const handleClose = () => {
-    setUnlocked(false);
     setPassword('');
     onClose();
   };
@@ -74,7 +64,7 @@ const AdminPanel = ({ open, onClose, t, showToast }) => {
   return (
     <Modal open={open} onClose={handleClose} title={t('admin') || 'Admin'}>
       <div className="space-y-4">
-        {!unlocked ? (
+        {!isAuthenticated ? (
           <>
             <div className="bg-card-alt rounded-xl p-4 border text-center space-y-2">
               <Shield size={28} className="text-faint mx-auto" />
